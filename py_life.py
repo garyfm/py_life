@@ -37,10 +37,10 @@ class Life:
     def seed_life(self):
         # Seed fixed to centre for now
         x, y = self.get_life_centre()
-        for i, row in enumerate(range(self.seed[0])):
-           self.cells[x + i][y].set_state(self.seed[i]) 
-           for i, col in enumerate(range(self.seed[1] - 1)):
-                self.cells[row][y + i].set_state(self.seed[i]) 
+        for i, row in enumerate(self.seed):
+           self.cells[y][x + i].set_state(row) # TODO Fix this 
+           #for j, col in enumerate(self.seed[1:]):
+           #    self.cells[y + i][x].set_state(row) 
 
     def print_life(self):
         for row in self.cells:
