@@ -27,10 +27,7 @@ class Life:
         self.create_cells()    
         self.seed_life()
         self.print_life()
-<<<<<<< HEAD
-=======
         self.run_life()
->>>>>>> Getting neighbours states, fixed seeding
 
     def create_cells(self):
         for row in range(self.size[0]):
@@ -42,12 +39,6 @@ class Life:
     def seed_life(self):
         # Seed fixed to centre for now
         x, y = self.get_life_centre()
-<<<<<<< HEAD
-        for i, row in enumerate(self.seed):
-           self.cells[y][x + i].set_state(row) # TODO Fix this 
-           #for j, col in enumerate(self.seed[1:]):
-           #    self.cells[y + i][x].set_state(row) 
-=======
         rows = len(self.seed)
         cols = len(self.seed[0])
 
@@ -62,7 +53,6 @@ class Life:
         cell = self.cells[5][5]
         cell.probe_neighbours(self, 5, 5)
         print(cell.get_neighbours_states())
->>>>>>> Getting neighbours states, fixed seeding
 
     def print_life(self):
         for row in self.cells:
@@ -125,11 +115,8 @@ class Cell:
         self.neigh_states.append(life.cells[row][col - 1].get_current_state())
 
 def main():
-<<<<<<< HEAD
-    init_seed = [ALIVE, ALIVE, ALIVE, ALIVE]
-=======
+
     init_seed = [[ALIVE, ALIVE, ALIVE, ALIVE], [ALIVE, ALIVE, DEAD, DEAD]]
->>>>>>> Getting neighbours states, fixed seeding
 
     life = Life([10,10], 100, init_seed)
     print(life.get_num_cells())
