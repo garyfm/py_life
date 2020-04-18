@@ -3,6 +3,7 @@
 # Consts
 ALIVE = True
 DEAD = False
+NUM_NEIGH_CELLS = 8
 # Colors
 RED = '\033[91m'
 GREEN = '\033[92m'
@@ -26,6 +27,10 @@ class Life:
         self.create_cells()    
         self.seed_life()
         self.print_life()
+<<<<<<< HEAD
+=======
+        self.run_life()
+>>>>>>> Getting neighbours states, fixed seeding
 
     def create_cells(self):
         for row in range(self.size[0]):
@@ -37,10 +42,27 @@ class Life:
     def seed_life(self):
         # Seed fixed to centre for now
         x, y = self.get_life_centre()
+<<<<<<< HEAD
         for i, row in enumerate(self.seed):
            self.cells[y][x + i].set_state(row) # TODO Fix this 
            #for j, col in enumerate(self.seed[1:]):
            #    self.cells[y + i][x].set_state(row) 
+=======
+        rows = len(self.seed)
+        cols = len(self.seed[0])
+
+        for row in range(rows):
+            self.cells[x + row][y].set_state(self.seed[0][row])
+#            self.print_life()
+            for col in range(cols):
+                self.cells[x + row][y + col].set_state(self.seed[row][col])
+#                self.print_life()
+
+    def run_life(self):
+        cell = self.cells[5][5]
+        cell.probe_neighbours(self, 5, 5)
+        print(cell.get_neighbours_states())
+>>>>>>> Getting neighbours states, fixed seeding
 
     def print_life(self):
         for row in self.cells:
@@ -73,7 +95,7 @@ class Cell:
     'Cell Class'
     state = DEAD
     next_state = None 
-    neighbours_states = []
+    neigh_states = []
 
     def __init__(self):
        self.neighbours_states = None  
@@ -83,18 +105,31 @@ class Cell:
     def get_next_state(self):
         return self.next_state
     def get_neighbours_states(self):
-        return self.neighbours_states
+        return self.neigh_states
     
     def set_state(self, state):
         self.state = state
     def set_next_state(self, state):
         self.next_state = state
     def set_neighbours_states(self, states):
-        self.neighbours_states = states  # TODO: fix for list
+        self.neighbours_states = states 
 
+    def probe_neighbours(self, life, row, col):
+        self.neigh_states.append(life.cells[row - 1][col - 1].get_current_state())
+        self.neigh_states.append(life.cells[row - 1][col].get_current_state())
+        self.neigh_states.append(life.cells[row - 1][col + 1].get_current_state())
+        self.neigh_states.append(life.cells[row][col + 1].get_current_state())
+        self.neigh_states.append(life.cells[row + 1][col + 1].get_current_state())
+        self.neigh_states.append(life.cells[row + 1][col].get_current_state())
+        self.neigh_states.append(life.cells[row + 1][col - 1].get_current_state())
+        self.neigh_states.append(life.cells[row][col - 1].get_current_state())
 
 def main():
+<<<<<<< HEAD
     init_seed = [ALIVE, ALIVE, ALIVE, ALIVE]
+=======
+    init_seed = [[ALIVE, ALIVE, ALIVE, ALIVE], [ALIVE, ALIVE, DEAD, DEAD]]
+>>>>>>> Getting neighbours states, fixed seeding
 
     life = Life([10,10], 100, init_seed)
     print(life.get_num_cells())
