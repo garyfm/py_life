@@ -1,8 +1,11 @@
 #!/usr/bin/python3
 
+import time
+
 # Consts
 ALIVE = True
 DEAD = False
+NUM_NEIGH_CELLS = 8
 # Colors
 RED = '\033[91m'
 GREEN = '\033[92m'
@@ -26,6 +29,7 @@ class Life:
         self.create_cells()    
         self.seed_life()
         self.print_life()
+        self.run_life()
 
     def create_cells(self):
         for row in range(self.size[0]):
@@ -37,15 +41,30 @@ class Life:
     def seed_life(self):
         # Seed fixed to centre for now
         x, y = self.get_life_centre()
-        for i, row in enumerate(self.seed):
-           self.cells[y][x + i].set_state(row) # TODO Fix this 
-           #for j, col in enumerate(self.seed[1:]):
-           #    self.cells[y + i][x].set_state(row) 
+        rows = len(self.seed)
+        cols = len(self.seed[0])
 
+        for row in range(rows):
+            self.cells[x + row][y].set_state(self.seed[0][row])
+#            self.print_life()
+            for col in range(cols):
+                self.cells[x + row][y + col].set_state(self.seed[row][col])
+#                self.print_life()
+
+    def run_life(self):
+        for tick in range(self.end_tick):
+            for row, row_cells in enumerate(self.cells):
+                for col, cell in enumerate(row_cells):
+                    cell.probe_neighbours(self, row, col)
+                    cell.get_next_gen()
+                    cell.update()
+            self.print_life()
+            time.sleep(1)
+            
     def print_life(self):
         for row in self.cells:
             for cell in row:
-                print("[" + str(cell.get_current_state()) + "],", end = '')
+                print("[" + str(cell.get_state()) + "],", end = '')
             print("\r\n")
 
     def get_life_centre(self):
@@ -55,46 +74,63 @@ class Life:
 
     def get_num_cells(self):
         return self.num_cells 
+
     def update_num_cells(self):
         nrow = len(self.cells)
         ncols = len(self.cells[0])
         self.num_cells = nrow * ncols
 
-    def get_size(self):
-        return self.size
-    def get_end_tick(self):
-        return self.ticks
-    def get_tick(self):
-        return self.current_tick        
-    def inc_ticks(self):
-        self.current_tick += 1
-
 class Cell:
     'Cell Class'
     state = DEAD
     next_state = None 
-    neighbours_states = []
+    neigh_states = [DEAD]
 
-    def __init__(self):
-       self.neighbours_states = None  
-
-    def get_current_state(self):
+    def get_state(self):
         return self.state
-    def get_next_state(self):
-        return self.next_state
-    def get_neighbours_states(self):
-        return self.neighbours_states
-    
     def set_state(self, state):
         self.state = state
-    def set_next_state(self, state):
-        self.next_state = state
-    def set_neighbours_states(self, states):
-        self.neighbours_states = states  # TODO: fix for list
+    
+    def probe_neighbours(self, life, row, col):
+        # Loop over each possible transform to get each neightbouring cell
+        for row_trans in [1, 0, -1]:
+            for col_trans in [1, 0, -1]:
+                # Check if neighbouring cell is out of bounds
+                neigh_pos = [row + row_trans, col + col_trans]
+                if ((neigh_pos[0] < 0) | (neigh_pos[0] > (life.size[0] - 1))):
+                    break
+                if ((neigh_pos[1] < 0) | (neigh_pos[1] > (life.size[1] - 1))):
+                    break
+                self.neigh_states.append(life.cells[neigh_pos[0]][neigh_pos[1]].get_state())
 
+        # TODO: For now all squares outside of board are dead
+        for i, item in enumerate(self.neigh_states):
+            if (item == None):
+                self.neigh_states[i] = DEAD
+    
+    def get_next_gen(self):
+        alive_neigh = sum(self.neigh_states)
+        if (self.state == ALIVE):
+            # Survive
+            if ((alive_neigh == 2) | (alive_neigh == 3)):
+                self.next_state = ALIVE
+                return
+            else:
+                # Under/Over Populated
+                self.next_state = DEAD
+                return
+        else:
+            # Reproduce
+            if (alive_neigh == 3):
+                self.next_state = ALIVE
+                return
+
+    def update(self):
+        self.state = self.next_state
 
 def main():
-    init_seed = [ALIVE, ALIVE, ALIVE, ALIVE]
+
+    init_seed = [[ALIVE, ALIVE, ALIVE, ALIVE], [ALIVE, ALIVE, DEAD, DEAD]]
 
     life = Life([10,10], 100, init_seed)
     print(life.get_num_cells())
