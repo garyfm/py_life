@@ -1,5 +1,7 @@
 #!/usr/bin/python3
 
+import time
+
 # Consts
 ALIVE = True
 DEAD = False
@@ -50,14 +52,19 @@ class Life:
 #                self.print_life()
 
     def run_life(self):
-        cell = self.cells[5][5]
-        cell.probe_neighbours(self, 5, 5)
-        print(cell.get_neighbours_states())
-
+        for tick in range(self.end_tick):
+            for row, row_cells in enumerate(self.cells):
+                for col, cell in enumerate(row_cells):
+                    cell.probe_neighbours(self, row, col)
+                    cell.get_next_gen()
+                    cell.update()
+            self.print_life()
+            time.sleep(1)
+            
     def print_life(self):
         for row in self.cells:
             for cell in row:
-                print("[" + str(cell.get_current_state()) + "],", end = '')
+                print("[" + str(cell.get_state()) + "],", end = '')
             print("\r\n")
 
     def get_life_centre(self):
@@ -67,52 +74,59 @@ class Life:
 
     def get_num_cells(self):
         return self.num_cells 
+
     def update_num_cells(self):
         nrow = len(self.cells)
         ncols = len(self.cells[0])
         self.num_cells = nrow * ncols
 
-    def get_size(self):
-        return self.size
-    def get_end_tick(self):
-        return self.ticks
-    def get_tick(self):
-        return self.current_tick        
-    def inc_ticks(self):
-        self.current_tick += 1
-
 class Cell:
     'Cell Class'
     state = DEAD
     next_state = None 
-    neigh_states = []
+    neigh_states = [DEAD]
 
-    def __init__(self):
-       self.neighbours_states = None  
-
-    def get_current_state(self):
+    def get_state(self):
         return self.state
-    def get_next_state(self):
-        return self.next_state
-    def get_neighbours_states(self):
-        return self.neigh_states
-    
     def set_state(self, state):
         self.state = state
-    def set_next_state(self, state):
-        self.next_state = state
-    def set_neighbours_states(self, states):
-        self.neighbours_states = states 
-
+    
     def probe_neighbours(self, life, row, col):
-        self.neigh_states.append(life.cells[row - 1][col - 1].get_current_state())
-        self.neigh_states.append(life.cells[row - 1][col].get_current_state())
-        self.neigh_states.append(life.cells[row - 1][col + 1].get_current_state())
-        self.neigh_states.append(life.cells[row][col + 1].get_current_state())
-        self.neigh_states.append(life.cells[row + 1][col + 1].get_current_state())
-        self.neigh_states.append(life.cells[row + 1][col].get_current_state())
-        self.neigh_states.append(life.cells[row + 1][col - 1].get_current_state())
-        self.neigh_states.append(life.cells[row][col - 1].get_current_state())
+        # Loop over each possible transform to get each neightbouring cell
+        for row_trans in [1, 0, -1]:
+            for col_trans in [1, 0, -1]:
+                # Check if neighbouring cell is out of bounds
+                neigh_pos = [row + row_trans, col + col_trans]
+                if ((neigh_pos[0] < 0) | (neigh_pos[0] > (life.size[0] - 1))):
+                    break
+                if ((neigh_pos[1] < 0) | (neigh_pos[1] > (life.size[1] - 1))):
+                    break
+                self.neigh_states.append(life.cells[neigh_pos[0]][neigh_pos[1]].get_state())
+
+        # TODO: For now all squares outside of board are dead
+        for i, item in enumerate(self.neigh_states):
+            if (item == None):
+                self.neigh_states[i] = DEAD
+    
+    def get_next_gen(self):
+        alive_neigh = sum(self.neigh_states)
+        if (self.state == ALIVE):
+            # Survive
+            if ((alive_neigh == 2) | (alive_neigh == 3)):
+                self.next_state = ALIVE
+                return
+            else:
+                # Under/Over Populated
+                self.next_state = DEAD
+                return
+        else:
+            # Reproduce
+            if (alive_neigh == 3):
+                self.next_state = ALIVE
+                return
+
+    def update(self):
+        self.state = self.next_state
 
 def main():
 
