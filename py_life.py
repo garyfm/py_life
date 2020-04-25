@@ -10,6 +10,13 @@ NUM_NEIGH_CELLS = 8
 RED = '\033[91m'
 GREEN = '\033[92m'
 ENDC = '\033[0m'
+#Display
+FPS = 60 
+BLACK = (0, 0, 0)
+WHITE = (255, 255, 255)
+CELL_SIZE = 10
+DISPLAY_X = 200
+DISPLAY_Y = 200
 
 class Life:
     'Life Universe Class'
@@ -19,19 +26,20 @@ class Life:
     current_tick = 0
     cells = []
     num_cells = 0
+    board = None 
     
     def __init__(self, size, end_tick, seed):
-        print(GREEN + "Created Life Universe" + ENDC)
         self.size = size
         self.end_tick = end_tick
         self.seed = seed
         self.current_tick = 0
+        self.board = self.init_display(DISPLAY_X, DISPLAY_Y)
         self.create_cells()    
         self.seed_life()
-        self.print_life()
         self.run_life()
 
     def create_cells(self):
+        print(GREEN + "Created Life Universe" + ENDC)
         for row in range(self.size[0]):
             self.cells.append([Cell()])
             for col in range((self.size[1] - 1)):
@@ -39,6 +47,7 @@ class Life:
         self.update_num_cells()
 
     def seed_life(self):
+        print(GREEN + "Seeding Life" + ENDC)
         # Seed fixed to centre for now
         x, y = self.get_life_centre()
         rows = len(self.seed)
@@ -48,22 +57,45 @@ class Life:
             self.cells[x + row][y].set_state(self.seed[0][row])
             for col in range(cols):
                 self.cells[x + row][y + col].set_state(self.seed[row][col])
+                pygame.draw.rect(self.board, WHITE, (x + row, y + col, CELL_SIZE,  CELL_SIZE))
+                pygame.display.flip()
 
     def run_life(self):
+        print(GREEN + "Running Life" + ENDC)
+
         for tick in range(self.end_tick):
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    print(RED + str(event) + ENDC)
+                    quit()
+     
             for row, row_cells in enumerate(self.cells):
                 for col, cell in enumerate(row_cells):
                     cell.probe_neighbours(self, row, col)
                     cell.get_next_gen()
                     cell.update()
-            self.print_life()
-            time.sleep(1)
-            
-    def print_life(self):
-        for row in self.cells:
-            for cell in row:
-                print("[" + str(cell.get_state()) + "],", end = '')
-            print("\r\n")
+                    print("Cell [" + str(row) + "," + str(col) + "]: " + str(cell.state))
+
+                    if cell.state == None:
+                        print(RED + "ERROR STATE NONE" + ENDC) 
+
+                    if cell.state == ALIVE:
+                        pygame.draw.rect(self.board, WHITE, (row, col, CELL_SIZE,  CELL_SIZE))
+                    else:
+                        pygame.draw.rect(self.board, BLACK, (row, col, CELL_SIZE,  CELL_SIZE))
+
+                    pygame.display.flip()
+                    time.sleep(1)
+            print(GREEN + "GEN: " + str(tick) + ENDC)
+            time.sleep(5)
+
+    def init_display(self, x_size, y_size):
+        pygame.init()
+        screen = pygame.display.set_mode((x_size , y_size)) 
+        clock = pygame.time.Clock()
+        pygame.display.set_caption('PYLIFE')
+        clock.tick(60)
+        return screen
 
     def get_life_centre(self):
         centre_x = int(len(self.cells) / 2) 
@@ -78,10 +110,11 @@ class Life:
         ncols = len(self.cells[0])
         self.num_cells = nrow * ncols
 
+    
 class Cell:
     'Cell Class'
     state = DEAD
-    next_state = None 
+    next_state = DEAD 
     neigh_states = [DEAD]
 
     def get_state(self):
@@ -125,40 +158,12 @@ class Cell:
 
     def update(self):
         self.state = self.next_state
-#class GUI:
-#    life = None
-#    window = None
-#
-#    def __init__(self):
-#        #self.life = life
-#        self.create_window()
-#
-#    def create_window(self):
-#
+
 def main():
 
     init_seed = [[ALIVE, ALIVE, ALIVE, ALIVE], [ALIVE, ALIVE, DEAD, DEAD]]
     
-    #life = Life([10,10], 100, init_seed)
-    BLACK = (0, 0, 0)
-    FPS = 60  # This variable will define how many frames we update per second.
-    WHITE = (255, 255, 255)
-
-    pygame.init()
-    screen = pygame.display.set_mode((720, 480))  # Notice the tuple! It's not 2 arguments.
-    clock = pygame.time.Clock()
-    pygame.display.set_caption('PYLIFE')
-    rect = pygame.Rect((0, 0), (32, 32))  # First tuple is position, second is size.
-    image = pygame.Surface((32, 32))  # The tuple represent size.
-    image.fill(WHITE)  # We fill our surface with a nice white color (by default black).
-
-    while (True):
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                print(event)
-                quit()
-        clock.tick(60)
-        pygame.display.update()
+    life = Life([10, 10], 100, init_seed)
 
 if __name__ == "__main__":
     main()
