@@ -1,6 +1,6 @@
 #!/usr/bin/python3
-
 import time
+import pygame
 
 # Consts
 ALIVE = True
@@ -46,10 +46,8 @@ class Life:
 
         for row in range(rows):
             self.cells[x + row][y].set_state(self.seed[0][row])
-#            self.print_life()
             for col in range(cols):
                 self.cells[x + row][y + col].set_state(self.seed[row][col])
-#                self.print_life()
 
     def run_life(self):
         for tick in range(self.end_tick):
@@ -127,13 +125,40 @@ class Cell:
 
     def update(self):
         self.state = self.next_state
-
+#class GUI:
+#    life = None
+#    window = None
+#
+#    def __init__(self):
+#        #self.life = life
+#        self.create_window()
+#
+#    def create_window(self):
+#
 def main():
 
     init_seed = [[ALIVE, ALIVE, ALIVE, ALIVE], [ALIVE, ALIVE, DEAD, DEAD]]
+    
+    #life = Life([10,10], 100, init_seed)
+    BLACK = (0, 0, 0)
+    FPS = 60  # This variable will define how many frames we update per second.
+    WHITE = (255, 255, 255)
 
-    life = Life([10,10], 100, init_seed)
-    print(life.get_num_cells())
+    pygame.init()
+    screen = pygame.display.set_mode((720, 480))  # Notice the tuple! It's not 2 arguments.
+    clock = pygame.time.Clock()
+    pygame.display.set_caption('PYLIFE')
+    rect = pygame.Rect((0, 0), (32, 32))  # First tuple is position, second is size.
+    image = pygame.Surface((32, 32))  # The tuple represent size.
+    image.fill(WHITE)  # We fill our surface with a nice white color (by default black).
+
+    while (True):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                print(event)
+                quit()
+        clock.tick(60)
+        pygame.display.update()
 
 if __name__ == "__main__":
     main()
