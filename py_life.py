@@ -14,7 +14,7 @@ ENDC = '\033[0m'
 FPS = 60 
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
-CELL_SIZE = 10
+CELL_SIZE = 20
 DISPLAY_X = 200
 DISPLAY_Y = 200
 
@@ -33,7 +33,7 @@ class Life:
         self.end_tick = end_tick
         self.seed = seed
         self.current_tick = 0
-        self.board = self.init_display(DISPLAY_X, DISPLAY_Y)
+        #self.board = self.init_display(DISPLAY_X, DISPLAY_Y)
         self.create_cells()    
         self.seed_life()
         self.run_life()
@@ -57,37 +57,48 @@ class Life:
             self.cells[x + row][y].set_state(self.seed[0][row])
             for col in range(cols):
                 self.cells[x + row][y + col].set_state(self.seed[row][col])
-                pygame.draw.rect(self.board, WHITE, (x + row, y + col, CELL_SIZE,  CELL_SIZE))
-                pygame.display.flip()
+                #pygame.draw.rect(self.board, WHITE, (x + row, y + col, CELL_SIZE,  CELL_SIZE))
+                #pygame.display.flip()
+
+        print(GREEN + "SEED" + ENDC)
+        for print_row in self.cells:
+            for cell in print_row:
+                print("[" +str(cell.get_state()) + "],", end = '')
+            print("\r\n")
 
     def run_life(self):
         print(GREEN + "Running Life" + ENDC)
 
         for tick in range(self.end_tick):
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    print(RED + str(event) + ENDC)
-                    quit()
+            print(GREEN + "GEN: " + str(tick) + ENDC)
+            #for event in pygame.event.get():
+            #    if event.type == pygame.QUIT:
+            #        print(RED + str(event) + ENDC)
+            #        quit()
      
             for row, row_cells in enumerate(self.cells):
                 for col, cell in enumerate(row_cells):
                     cell.probe_neighbours(self, row, col)
                     cell.get_next_gen()
-                    cell.update()
-                    print("Cell [" + str(row) + "," + str(col) + "]: " + str(cell.state))
+                    
+                    #print("Cell [" + str(row) + "," + str(col) + "]: " + str(cell.state))
 
                     if cell.state == None:
                         print(RED + "ERROR STATE NONE" + ENDC) 
 
-                    if cell.state == ALIVE:
-                        pygame.draw.rect(self.board, WHITE, (row, col, CELL_SIZE,  CELL_SIZE))
-                    else:
-                        pygame.draw.rect(self.board, BLACK, (row, col, CELL_SIZE,  CELL_SIZE))
+            for print_row in self.cells:
+                for cell in print_row:
+                    cell.update()
+                    print("[" +str(cell.get_state()) + "],", end = '')
+                print("\r\n")
+                    #if cell.state == ALIVE:
+                    #    pygame.draw.rect(self.board, WHITE, (row, col, CELL_SIZE,  CELL_SIZE))
+                    #else:
+                    #    pygame.draw.rect(self.board, BLACK, (row, col, CELL_SIZE,  CELL_SIZE))
 
-                    pygame.display.flip()
-                    time.sleep(1)
-            print(GREEN + "GEN: " + str(tick) + ENDC)
-            time.sleep(5)
+                    #pygame.display.flip()
+                    #time.sleep(1)
+            time.sleep(1)
 
     def init_display(self, x_size, y_size):
         pygame.init()
@@ -115,7 +126,7 @@ class Cell:
     'Cell Class'
     state = DEAD
     next_state = DEAD 
-    neigh_states = [DEAD]
+    neigh_states = [] 
 
     def get_state(self):
         return self.state
@@ -123,23 +134,31 @@ class Cell:
         self.state = state
     
     def probe_neighbours(self, life, row, col):
+        
         # Loop over each possible transform to get each neightbouring cell
+        self.neigh_states.clear()
         for row_trans in [1, 0, -1]:
             for col_trans in [1, 0, -1]:
-                # Check if neighbouring cell is out of bounds
                 neigh_pos = [row + row_trans, col + col_trans]
-                if ((neigh_pos[0] < 0) | (neigh_pos[0] > (life.size[0] - 1))):
-                    break
-                if ((neigh_pos[1] < 0) | (neigh_pos[1] > (life.size[1] - 1))):
-                    break
-                self.neigh_states.append(life.cells[neigh_pos[0]][neigh_pos[1]].get_state())
+                
+                # Dont count the current cell as a neighbour
+                if (row_trans == 0) and (col_trans == 0):
+                    continue
+                # Check if neighbouring cell is out of bounds
+                if ((neigh_pos[0] < 0) | (neigh_pos[0] >= (life.size[0]))):
+                    continue
+                if ((neigh_pos[1] < 0) | (neigh_pos[1] >= (life.size[1]))):
+                    continue
 
-        # TODO: For now all squares outside of board are dead
-        for i, item in enumerate(self.neigh_states):
-            if (item == None):
-                self.neigh_states[i] = DEAD
-    
+                neigh_state = life.cells[neigh_pos[0]][neigh_pos[1]].get_state() 
+                self.neigh_states.append(neigh_state)
+                
     def get_next_gen(self):
+        #debug
+        live_cell = 0
+        if self.state == ALIVE:
+            live_cell+=1
+
         alive_neigh = sum(self.neigh_states)
         if (self.state == ALIVE):
             # Survive
@@ -161,9 +180,9 @@ class Cell:
 
 def main():
 
-    init_seed = [[ALIVE, ALIVE, ALIVE, ALIVE], [ALIVE, ALIVE, DEAD, DEAD]]
+    init_seed = [[ALIVE, ALIVE, ALIVE], [DEAD, DEAD, DEAD]]
     
-    life = Life([10, 10], 100, init_seed)
+    life = Life([5, 5], 10, init_seed)
 
 if __name__ == "__main__":
     main()
