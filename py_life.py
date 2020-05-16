@@ -33,7 +33,7 @@ class Life:
         self.end_tick = end_tick
         self.seed = seed
         self.current_tick = 0
-        #self.board = self.init_display(DISPLAY_X, DISPLAY_Y)
+        self.board = self.init_display(DISPLAY_X, DISPLAY_Y)
         self.create_cells()    
         self.seed_life()
         self.run_life()
@@ -57,8 +57,8 @@ class Life:
             self.cells[x + row][y].set_state(self.seed[0][row])
             for col in range(cols):
                 self.cells[x + row][y + col].set_state(self.seed[row][col])
-                #pygame.draw.rect(self.board, WHITE, (x + row, y + col, CELL_SIZE,  CELL_SIZE))
-                #pygame.display.flip()
+                pygame.draw.rect(self.board, WHITE, (x + row, y + col, CELL_SIZE,  CELL_SIZE))
+                pygame.display.flip()
 
         print(GREEN + "SEED" + ENDC)
         for print_row in self.cells:
@@ -71,33 +71,26 @@ class Life:
 
         for tick in range(self.end_tick):
             print(GREEN + "GEN: " + str(tick) + ENDC)
-            #for event in pygame.event.get():
-            #    if event.type == pygame.QUIT:
-            #        print(RED + str(event) + ENDC)
-            #        quit()
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    print(RED + str(event) + ENDC)
+                    quit()
      
             for row, row_cells in enumerate(self.cells):
                 for col, cell in enumerate(row_cells):
                     cell.probe_neighbours(self, row, col)
                     cell.get_next_gen()
-                    
-                    #print("Cell [" + str(row) + "," + str(col) + "]: " + str(cell.state))
 
-                    if cell.state == None:
-                        print(RED + "ERROR STATE NONE" + ENDC) 
-
-            for print_row in self.cells:
-                for cell in print_row:
+            for row, row_cells in enumerate(self.cells):
+                for col, cell in enumerate(row_cells):
                     cell.update()
-                    print("[" +str(cell.get_state()) + "],", end = '')
-                print("\r\n")
-                    #if cell.state == ALIVE:
-                    #    pygame.draw.rect(self.board, WHITE, (row, col, CELL_SIZE,  CELL_SIZE))
-                    #else:
-                    #    pygame.draw.rect(self.board, BLACK, (row, col, CELL_SIZE,  CELL_SIZE))
+                    if cell.state == ALIVE:
+                        pygame.draw.rect(self.board, WHITE, (row, col, CELL_SIZE,  CELL_SIZE))
+                    else:
+                        pygame.draw.rect(self.board, BLACK, (row, col, CELL_SIZE,  CELL_SIZE))
 
-                    #pygame.display.flip()
-                    #time.sleep(1)
+            pygame.display.flip()
+            #self.print_console()        
             time.sleep(1)
 
     def init_display(self, x_size, y_size):
@@ -108,6 +101,12 @@ class Life:
         clock.tick(60)
         return screen
 
+    def print_console(self): # debug
+        for print_row in self.cells:
+            for cell in print_row:
+                print("[" +str(cell.get_state()) + "],", end = '')
+            print("\r\n")
+ 
     def get_life_centre(self):
         centre_x = int(len(self.cells) / 2) 
         centre_y = int(len(self.cells[0]) / 2)
