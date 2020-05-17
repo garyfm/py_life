@@ -176,6 +176,7 @@ class Cell:
 
     def update(self):
         self.state = self.next_state
+
 #Display
 FPS = 60 
 BLACK = (0, 0, 0)
@@ -186,47 +187,63 @@ DISPLAY_Y = 400
 NUM_CELL_X = DISPLAY_X // CELL_SIZE
 NUM_CELL_Y = DISPLAY_Y // CELL_SIZE
 
-def init_display(x_size, y_size):
-        pygame.init()
-        screen = pygame.display.set_mode((x_size , y_size)) 
-        clock = pygame.time.Clock()
-        pygame.display.set_caption('PYLIFE')
-        clock.tick(60)
-        return screen
+class Display:
+    'Board display Class'
+    board = None
+    x_size = 0
+    y_size = 0
+    cell_size = 0
+    x_num_cells = 0
+    y_num_cells = 0
 
-def draw_grid(board):
-    for x in range(NUM_CELL_X):
-        for y in range(NUM_CELL_Y):
-            rect = pygame.Rect(x*CELL_SIZE, y*CELL_SIZE, CELL_SIZE, CELL_SIZE) 
-            pygame.draw.rect(board, WHITE, rect, 1)
-            pygame.display.flip()
+    def __init__(self, x_size, y_size, cell_size):
+        self.x_size = x_size
+        self.y_size = y_size
+        self.cell_size = cell_size 
+        self.x_num_cells = self.x_size // self.cell_size
+        self.y_num_cells = self.y_size // self.cell_size
+        self.board = self.init_display()
+        self.draw_grid()
 
-def draw_cell(x, y, state, board):
-    if state == ALIVE:
-        colour = WHITE
-    else:
-        colour = BLACK
+    def init_display(self):
+            pygame.init()
+            screen = pygame.display.set_mode((self.x_size , self.y_size)) 
+            clock = pygame.time.Clock()
+            pygame.display.set_caption('PYLIFE')
+            clock.tick(60)
+            return screen
+    def update_display(self):
+        pygame.display.flip()
 
-    rect = pygame.Rect(x * 20, y * 20, CELL_SIZE, CELL_SIZE) 
-    pygame.draw.rect(board, colour, rect, 0)
+    def draw_grid(self):
+        for x in range(self.x_num_cells):
+            for y in range(self.y_num_cells):
+                rect = pygame.Rect(x*CELL_SIZE, y*CELL_SIZE, CELL_SIZE, CELL_SIZE) 
+                pygame.draw.rect(self.board, WHITE, rect, 1)
+                self.update_display()
+
+    def draw_cell(self, x, y, state):
+        if state == ALIVE:
+            colour = WHITE
+        else:
+            colour = BLACK
+
+        rect = pygame.Rect(x * 20, y * 20, CELL_SIZE, CELL_SIZE) 
+        pygame.draw.rect(self.board, colour, rect, 0)
 
 def main():
     #init_seed = [[ALIVE, ALIVE, ALIVE], [DEAD, DEAD, DEAD]]
     
     #life = Life([5, 5], 10, init_seed)
-    board = None 
 
-    board = init_display(DISPLAY_X, DISPLAY_Y)
-    #pygame.draw.rect(board, BLACK, (row, col, CELL_SIZE,  CELL_SIZE), 0)
-    pygame.display.flip()
+    board = Display(DISPLAY_X, DISPLAY_Y, CELL_SIZE)
     while 1:
         for event in pygame.event.get():
            if event.type == pygame.QUIT:
                print(RED + str(event) + ENDC)
                quit()
-        draw_grid(board)
-        draw_cell(10, 10, ALIVE, board)
-        pygame.display.flip()
+        board.draw_cell(10, 10, ALIVE)
+        board.update_display()
 
 if __name__ == "__main__":
     main()
