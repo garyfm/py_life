@@ -10,13 +10,13 @@ NUM_NEIGH_CELLS = 8
 RED = '\033[91m'
 GREEN = '\033[92m'
 ENDC = '\033[0m'
-#Display
-FPS = 60 
-BLACK = (0, 0, 0)
-WHITE = (255, 255, 255)
-CELL_SIZE = 20
-DISPLAY_X = 200
-DISPLAY_Y = 200
+##Display
+#FPS = 60 
+#BLACK = (0, 0, 0)
+#WHITE = (255, 255, 255)
+#CELL_SIZE = 20
+#DISPLAY_X = 200
+#DISPLAY_Y = 200
 
 class Life:
     'Life Universe Class'
@@ -57,7 +57,7 @@ class Life:
             self.cells[x + row][y].set_state(self.seed[0][row])
             for col in range(cols):
                 self.cells[x + row][y + col].set_state(self.seed[row][col])
-                pygame.draw.rect(self.board, WHITE, (x + row, y + col, CELL_SIZE,  CELL_SIZE))
+                pygame.draw.rect(self.board, WHITE, (x + row, y + col, CELL_SIZE,  CELL_SIZE), 0)
                 pygame.display.flip()
 
         print(GREEN + "SEED" + ENDC)
@@ -85,9 +85,9 @@ class Life:
                 for col, cell in enumerate(row_cells):
                     cell.update()
                     if cell.state == ALIVE:
-                        pygame.draw.rect(self.board, WHITE, (row, col, CELL_SIZE,  CELL_SIZE))
+                        pygame.draw.rect(self.board, WHITE, (row, col, CELL_SIZE,  CELL_SIZE), 0)
                     else:
-                        pygame.draw.rect(self.board, BLACK, (row, col, CELL_SIZE,  CELL_SIZE))
+                        pygame.draw.rect(self.board, BLACK, (row, col, CELL_SIZE,  CELL_SIZE), 0)
 
             pygame.display.flip()
             #self.print_console()        
@@ -176,12 +176,45 @@ class Cell:
 
     def update(self):
         self.state = self.next_state
+#Display
+FPS = 60 
+BLACK = (0, 0, 0)
+WHITE = (255, 255, 255)
+CELL_SIZE = 1
+DISPLAY_X = 400
+DISPLAY_Y = 400
 
+
+def init_display(x_size, y_size):
+        pygame.init()
+        screen = pygame.display.set_mode((x_size , y_size)) 
+        clock = pygame.time.Clock()
+        pygame.display.set_caption('PYLIFE')
+        clock.tick(60)
+        return screen
+
+def draw_grid(board):
+    CELL_SIZE = 20 #Set the size of the grid block
+    for x in range(DISPLAY_X):
+        for y in range(DISPLAY_Y):
+            rect = pygame.Rect(x*CELL_SIZE, y*CELL_SIZE, CELL_SIZE, CELL_SIZE) 
+            pygame.draw.rect(board, WHITE, rect, 1)
 def main():
-
-    init_seed = [[ALIVE, ALIVE, ALIVE], [DEAD, DEAD, DEAD]]
+    #init_seed = [[ALIVE, ALIVE, ALIVE], [DEAD, DEAD, DEAD]]
     
-    life = Life([5, 5], 10, init_seed)
+    #life = Life([5, 5], 10, init_seed)
+    board = None 
 
+    board = init_display(DISPLAY_X, DISPLAY_Y)
+    #pygame.draw.rect(board, BLACK, (row, col, CELL_SIZE,  CELL_SIZE), 0)
+    pygame.display.flip()
+    while 1:
+        for event in pygame.event.get():
+           if event.type == pygame.QUIT:
+               print(RED + str(event) + ENDC)
+               quit()
+        draw_grid(board)
+        pygame.display.flip()
+     
 if __name__ == "__main__":
     main()
