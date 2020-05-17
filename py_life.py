@@ -61,7 +61,7 @@ class Life:
 
                 if cell.state == ALIVE:
                     self.board.draw_cell(x + row, y + col, ALIVE)
-                    self.board.update_display()
+        self.board.update_display()
 
     def run_life(self):
         print(GREEN + "Running Life" + ENDC)

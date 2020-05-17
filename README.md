@@ -1,11 +1,4 @@
 ## Conways Game Of Life in Python
-# Features
-* GUI
-* OOP
-* Board
-* Cells
-* Seed
-
 # Rules
 2D Grid of square cells, each of which has two possible states:
 * Alive
@@ -22,10 +15,19 @@ At time tick N the following transistions occur:
 Life 
 * Initial Setup of Universe State (Size, Seed, Ticks)
 * Holds State of Universe 
-* Time ticks
+* Generational ticks
 * Made up of NxM cells
 
 Cells
 * Holds Dead/Alive State
 * Current and Next State
-* Holds State of neighbours
+* Holds State of Neighbours
+* Probes Neighbours
+
+Display
+* Initialise Display Board
+* Draws Cell Grid
+* Draws Cells
+
+# Example
+![](https://github.com/garyfm/py_life/blob/master/py_life.png
