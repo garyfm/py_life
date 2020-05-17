@@ -10,13 +10,13 @@ NUM_NEIGH_CELLS = 8
 RED = '\033[91m'
 GREEN = '\033[92m'
 ENDC = '\033[0m'
-##Display
-#FPS = 60 
-#BLACK = (0, 0, 0)
-#WHITE = (255, 255, 255)
-#CELL_SIZE = 20
-#DISPLAY_X = 200
-#DISPLAY_Y = 200
+#Display
+FPS = 60 
+BLACK = (0, 0, 0)
+WHITE = (255, 255, 255)
+CELL_SIZE = 20
+DISPLAY_X = 400
+DISPLAY_Y = 400
 
 class Life:
     'Life Universe Class'
@@ -54,14 +54,14 @@ class Life:
         cols = len(self.seed[0])
 
         for row in range(rows):
-            self.cells[x + row][y].set_state(self.seed[0][row])
+            self.cells[y][x + row].set_state(self.seed[0][row])
             for col in range(cols):
-                cell = self.cells[x + row][y + col]
+                cell = self.cells[y + col][x + row]
                 cell.set_state(self.seed[row][col])
 
                 if cell.state == ALIVE:
                     self.board.draw_cell(x + row, y + col, ALIVE)
-                    self.board.update_display()
+        self.board.update_display()
 
     def run_life(self):
         print(GREEN + "Running Life" + ENDC)
@@ -162,15 +162,6 @@ class Cell:
     def update(self):
         self.state = self.next_state
 
-#Display
-FPS = 60 
-BLACK = (0, 0, 0)
-WHITE = (255, 255, 255)
-CELL_SIZE = 20
-DISPLAY_X = 400
-DISPLAY_Y = 400
-NUM_CELL_X = DISPLAY_X // CELL_SIZE
-NUM_CELL_Y = DISPLAY_Y // CELL_SIZE
 
 class Display:
     'Board display Class'
@@ -220,10 +211,19 @@ class Display:
         pygame.draw.rect(self.board, colour, rect, 0)
 
 def main():
-    init_seed = [[ALIVE, ALIVE, ALIVE], [DEAD, DEAD, DEAD]]
-    
+    # Blinker 
+    seed_1 = [[ALIVE, ALIVE, ALIVE], [DEAD, DEAD, DEAD]]
+    # Toad
+    seed_2 = [[DEAD, ALIVE, ALIVE, ALIVE], [ALIVE, ALIVE, ALIVE, DEAD]]
+    # Beacon
+    seed_3 = [[ALIVE, ALIVE, DEAD, DEAD], [ALIVE, ALIVE, DEAD, DEAD], [DEAD, DEAD, ALIVE, ALIVE], [DEAD, DEAD, ALIVE, ALIVE]]
+    # R-pentomino
+    seed_4 = [[DEAD, ALIVE, ALIVE], [ALIVE, ALIVE, DEAD], [DEAD, ALIVE, DEAD]] 
+    # Glider
+    seed_5 = [[DEAD, ALIVE, DEAD], [DEAD, DEAD, ALIVE], [ALIVE, ALIVE, ALIVE]] 
+
     display = Display(DISPLAY_X, DISPLAY_Y, CELL_SIZE)
-    life = Life([20, 20], 10, init_seed, display)
+    life = Life([20, 20], 100, seed_5, display)
 
 if __name__ == "__main__":
     main()
