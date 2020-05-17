@@ -211,12 +211,19 @@ class Display:
         pygame.draw.rect(self.board, colour, rect, 0)
 
 def main():
-    init_seed_1 = [[ALIVE, ALIVE, ALIVE], [DEAD, DEAD, DEAD]]
-    init_seed_2 = [[DEAD, ALIVE, ALIVE, ALIVE], [ALIVE, ALIVE, ALIVE, DEAD]]
-    init_seed_3 = [[ALIVE, ALIVE, DEAD, DEAD], [DEAD, DEAD, DEAD]]
-    
+    # Blinker 
+    seed_1 = [[ALIVE, ALIVE, ALIVE], [DEAD, DEAD, DEAD]]
+    # Toad
+    seed_2 = [[DEAD, ALIVE, ALIVE, ALIVE], [ALIVE, ALIVE, ALIVE, DEAD]]
+    # Beacon
+    seed_3 = [[ALIVE, ALIVE, DEAD, DEAD], [ALIVE, ALIVE, DEAD, DEAD], [DEAD, DEAD, ALIVE, ALIVE], [DEAD, DEAD, ALIVE, ALIVE]]
+    # R-pentomino
+    seed_4 = [[DEAD, ALIVE, ALIVE], [ALIVE, ALIVE, DEAD], [DEAD, ALIVE, DEAD]] 
+    # Glider
+    seed_5 = [[DEAD, ALIVE, DEAD], [DEAD, DEAD, ALIVE], [ALIVE, ALIVE, ALIVE]] 
+
     display = Display(DISPLAY_X, DISPLAY_Y, CELL_SIZE)
-    life = Life([20, 20], 20, init_seed_2, display)
+    life = Life([20, 20], 100, seed_5, display)
 
 if __name__ == "__main__":
     main()
